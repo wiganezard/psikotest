@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Latihan Deret Angka (Psikotest)</title>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#121a33; --muted:#9fb0ff; --text:#eaf0ff;
+      --accent:#6aa8ff; --accent2:#7dffb2; --danger:#ff6a6a; --warn:#ffd36a;
+      --line: rgba(255,255,255,.12);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 600px at 20% 0%, #16214a 0%, var(--bg) 45%) fixed;
+      color:var(--text);
+    }
+    .wrap{max-width:980px; margin:0 auto; padding:18px}
+    header{
+      display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      margin:6px 0 14px;
+    }
+    h1{font-size:18px; margin:0}
+    .sub{font-size:12px; color:rgba(234,240,255,.72)}
+    .grid{display:grid; grid-template-columns: 1.05fr .95fr; gap:14px}
+    @media (max-width:860px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: 0 20px 70px rgba(0,0,0,.35);
+      backdrop-filter: blur(8px);
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    label{font-size:12px; color:rgba(234,240,255,.78)}
+    select, input[type="number"], input[type="checkbox"]{
+      accent-color: var(--accent);
+    }
+    select, input[type="number"]{
+      width:100%;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline:none;
+    }
+    .field{flex:1; min-width:150px}
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(106,168,255,.14);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      transition: transform .05s ease, background .2s ease;
+      user-select:none;
+    }
+    .btn:hover{background: rgba(106,168,255,.22)}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{background: rgba(125,255,178,.16)}
+    .btn.primary:hover{background: rgba(125,255,178,.24)}
+    .btn.danger{background: rgba(255,106,106,.14)}
+    .btn.danger:hover{background: rgba(255,106,106,.22)}
+    .pill{
+      font-size:12px; padding:6px 10px; border-radius:999px;
+      border:1px solid var(--line); background: rgba(0,0,0,.15);
+      color: rgba(234,240,255,.85);
+    }
+    .qhead{display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
+    .seq{
+      font-size:22px; letter-spacing:.4px;
+      padding:10px 12px; border-radius:14px;
+      background: rgba(0,0,0,.16);
+      border:1px dashed rgba(255,255,255,.18);
+      margin:10px 0 12px;
+      line-height:1.35;
+    }
+    .choices{display:grid; gap:10px}
+    .choice{
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.14);
+      padding:12px;
+      border-radius:14px;
+      cursor:pointer;
+      display:flex; gap:10px; align-items:center;
+      transition: background .2s ease, border-color .2s ease;
+    }
+    .choice:hover{background: rgba(0,0,0,.22)}
+    .choice input{transform: scale(1.15)}
+    .small{font-size:12px; color: rgba(234,240,255,.74)}
+    .muted{color: rgba(234,240,255,.72)}
+    .hr{height:1px; background: var(--line); margin:12px 0}
+    .status{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    }
+    .bar{
+      height:10px; border-radius:999px; border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      overflow:hidden;
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(106,168,255,.9), rgba(125,255,178,.9));
+      transition: width .25s ease;
+    }
+    .explain{
+      border-left: 3px solid rgba(106,168,255,.7);
+      background: rgba(106,168,255,.08);
+      padding:10px 12px;
+      border-radius:14px;
+      display:none;
+    }
+    .tag{
+      font-size:11px; padding:4px 8px; border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.14);
+      color: rgba(234,240,255,.78);
+    }
+    .right{color: var(--accent2)}
+    .wrong{color: var(--danger)}
+    .kbd{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:11px; padding:2px 6px; border-radius:8px; border:1px solid var(--line);
+      background: rgba(0,0,0,.18); color: rgba(234,240,255,.8)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Latihan Deret Angka (Psikotest)</h1>
+        <div class="sub">Generator soal • pilihan ganda • skor • pembahasan singkat • bisa atur kesulitan</div>
+      </div>
+      <div class="row">
+        <span class="pill" id="pillMode">Mode: Campuran</span>
+        <span class="pill" id="pillTimer">Timer: OFF</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: QUIZ -->
+      <section class="card" aria-label="Quiz">
+        <div class="status">
+          <div class="row">
+            <span class="tag" id="tagType">Tipe: -</span>
+            <span class="tag" id="tagDiff">Kesulitan: -</span>
+            <span class="tag" id="tagQ">Soal: 0/0</span>
+          </div>
+          <div class="row">
+            <span class="tag" id="tagScore">Skor: 0</span>
+            <span class="tag" id="tagTime">Waktu: 00:00</span>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="qhead">
+          <div>
+            <div class="small muted">Pilih angka yang paling tepat untuk mengisi tanda <b>?</b></div>
+          </div>
+          <div class="small muted">Shortcut: <span class="kbd">1</span>–<span class="kbd">5</span> untuk memilih</div>
+        </div>
+
+        <div class="seq" id="seq">Klik “Mulai” untuk membuat soal.</div>
+
+        <form class="choices" id="choices"></form>
+
+        <div class="row" style="margin-top:12px; justify-content:space-between">
+          <button class="btn" id="btnPrev" type="button" disabled>◀ Sebelumnya</button>
+          <div class="row">
+            <button class="btn danger" id="btnShow" type="button" disabled>Jawaban</button>
+            <button class="btn primary" id="btnNext" type="button" disabled>Berikutnya ▶</button>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="bar" aria-label="Progress"><div id="barFill"></div></div>
+
+        <div class="explain" id="explain" style="margin-top:12px;"></div>
+      </section>
+
+      <!-- RIGHT: SETTINGS -->
+      <aside class="card" aria-label="Pengaturan">
+        <div class="row">
+          <div class="field">
+            <label for="mode">Mode soal</label>
+            <select id="mode">
+              <option value="mix" selected>Campuran (acak)</option>
+              <option value="arith">Aritmetika (+/- tetap)</option>
+              <option value="geom">Geometri (×/÷ tetap)</option>
+              <option value="alt">Selang-seling (2 pola)</option>
+              <option value="second">Selisih tingkat 2 (beda selisih)</option>
+              <option value="fibo">Mirip Fibonacci</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="difficulty">Kesulitan</label>
+            <select id="difficulty">
+              <option value="easy">Mudah</option>
+              <option value="med" selected>Sedang</option>
+              <option value="hard">Sulit</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div class="field">
+            <label for="count">Jumlah soal</label>
+            <input id="count" type="number" min="5" max="50" value="15"/>
+          </div>
+          <div class="field">
+            <label for="len">Panjang deret</label>
+            <input id="len" type="number" min="5" max="10" value="6"/>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div class="field">
+            <label for="opt">Jumlah opsi</label>
+            <select id="opt">
+              <option value="4">4 opsi</option>
+              <option value="5" selected>5 opsi</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="neg">Angka negatif</label>
+            <select id="neg">
+              <option value="off" selected>Off</option>
+              <option value="on">On (kadang)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row">
+          <div class="field">
+            <label style="display:flex; gap:10px; align-items:center; cursor:pointer">
+              <input id="timer" type="checkbox" />
+              <span>Aktifkan timer (hitung waktu)</span>
+            </label>
+            <div class="small muted" style="margin-top:6px">Timer hanya menghitung durasi, tidak memaksa selesai.</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row">
+          <button class="btn primary" id="btnStart" type="button">▶ Mulai</button>
+          <button class="btn" id="btnShuffle" type="button" disabled>🔀 Acak ulang</button>
+          <button class="btn danger" id="btnReset" type="button" disabled>⟲ Reset</button>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="small muted">
+          <b>Catatan:</b> Generator ini bikin pola yang umum di psikotest: beda tetap, rasio, selang-seling,
+          selisih tingkat 2, dan mirip Fibonacci.  
+          Jika mau tipe lain (misalnya +2, +4, +8… atau pola digit), bilang aja nanti saya tambahin.
+        </div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ---------- Utils ----------
+  const $ = (id) => document.getElementById(id);
+  const randInt = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+  const choice = (arr) => arr[randInt(0, arr.length-1)];
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const uniq = (arr) => Array.from(new Set(arr));
+  const shuffle = (arr) => {
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const fmtTime = (sec) => {
+    sec = Math.max(0, Math.floor(sec));
+    const m = String(Math.floor(sec/60)).padStart(2,'0');
+    const s = String(sec%60).padStart(2,'0');
+    return `${m}:${s}`;
+  };
+
+  // ---------- Question Generators ----------
+  function genArithmetic(diff, allowNeg){
+    // a, a+d, ...
+    const d = diff === 'easy' ? randInt(1,9)
+            : diff === 'med'  ? randInt(2,15)
+            : randInt(5,30);
+    let start = diff === 'hard' ? randInt(5,80) : randInt(1,60);
+    if(allowNeg && Math.random()<0.25) start *= -1;
+
+    const len = getLen();
+    const seq = [];
+    for(let i=0;i<len;i++) seq.push(start + d*i);
+
+    return {
+      type:'Aritmetika',
+      seq,
+      answer: seq[len-1],
+      maskedIndex: len-1,
+      explain: `Pola: tambah ${d} setiap langkah.`
+    };
+  }
+
+  function genGeometric(diff, allowNeg){
+    // a, a*r, ... with integer results
+    const rsEasy = [2,3];
+    const rsMed  = [2,3,4,5];
+    const rsHard = [2,3,4,5,6];
+    const r = diff==='easy'?choice(rsEasy):diff==='med'?choice(rsMed):choice(rsHard);
+
+    let start = diff === 'hard' ? randInt(1,8) : randInt(1,12);
+    if(allowNeg && Math.random()<0.20) start *= -1;
+
+    const len = getLen();
+    const seq = [start];
+    for(let i=1;i<len;i++){
+      seq.push(seq[i-1]*r);
+    }
+
+    return {
+      type:'Geometri',
+      seq,
+      answer: seq[len-1],
+      maskedIndex: len-1,
+      explain: `Pola: kali ${r} setiap langkah.`
+    };
+  }
+
+  function genAlternating(diff, allowNeg){
+    // two interleaving arithmetic patterns
+    const len = getLen();
+    const d1 = diff==='easy'?randInt(1,6):diff==='med'?randInt(2,10):randInt(4,18);
+    const d2 = diff==='easy'?randInt(1,6):diff==='med'?randInt(2,10):randInt(4,18);
+
+    let a1 = randInt(1,40);
+    let a2 = randInt(1,40);
+    if(allowNeg && Math.random()<0.25) a1 *= -1;
+    if(allowNeg && Math.random()<0.25) a2 *= -1;
+
+    const seq = [];
+    let x=a1, y=a2;
+    for(let i=0;i<len;i++){
+      if(i%2===0){ seq.push(x); x += d1; }
+      else { seq.push(y); y += d2; }
+    }
+
+    return {
+      type:'Selang-seling',
+      seq,
+      answer: seq[len-1],
+      maskedIndex: len-1,
+      explain: `Pola: suku ganjil tambah ${d1}, suku genap tambah ${d2}.`
+    };
+  }
+
+  function genSecondDiff(diff, allowNeg){
+    // second-order arithmetic: differences increase by k
+    // Example: start, +d, +(d+k), +(d+2k) ...
+    const len = getLen();
+    let start = diff==='hard'?randInt(1,50):randInt(1,40);
+    if(allowNeg && Math.random()<0.2) start *= -1;
+
+    let d = diff==='easy'?randInt(1,6):diff==='med'?randInt(2,10):randInt(4,15);
+    const k = diff==='easy'?randInt(1,4):diff==='med'?randInt(2,6):randInt(3,9);
+
+    const seq = [start];
+    for(let i=1;i<len;i++){
+      seq.push(seq[i-1] + d);
+      d += k;
+    }
+
+    return {
+      type:'Selisih tingkat 2',
+      seq,
+      answer: seq[len-1],
+      maskedIndex: len-1,
+      explain: `Pola: selisih bertambah ${k} setiap langkah (beda selisih).`
+    };
+  }
+
+  function genFiboLike(diff, allowNeg){
+    // a, b, a+b, b+(a+b), ...
+    const len = getLen();
+    let a = diff==='hard'?randInt(1,30):randInt(1,20);
+    let b = diff==='hard'?randInt(1,30):randInt(1,20);
+    if(allowNeg && Math.random()<0.12) a *= -1; // keep rare, to avoid weirdness
+
+    const seq = [a,b];
+    while(seq.length < len){
+      seq.push(seq[seq.length-1] + seq[seq.length-2]);
+    }
+
+    return {
+      type:'Mirip Fibonacci',
+      seq,
+      answer: seq[len-1],
+      maskedIndex: len-1,
+      explain: `Pola: suku berikutnya = jumlah 2 suku sebelumnya.`
+    };
+  }
+
+  function pickGenerator(mode){
+    const map = {
+      arith: genArithmetic,
+      geom: genGeometric,
+      alt: genAlternating,
+      second: genSecondDiff,
+      fibo: genFiboLike
+    };
+    if(mode !== 'mix') return map[mode];
+    return choice([genArithmetic, genGeometric, genAlternating, genSecondDiff, genFiboLike]);
+  }
+
+  function makeChoices(answer, diff, countChoices){
+    // Create plausible distractors around answer
+    const span = diff==='easy'?8 : diff==='med'?18 : 35;
+    const step = diff==='easy'?1 : diff==='med'?2 : 5;
+
+    const opts = new Set([answer]);
+    while(opts.size < countChoices){
+      let delta = randInt(-span, span);
+      if(delta === 0) continue;
+      // snap to step
+      delta = Math.round(delta/step)*step;
+      if(delta === 0) continue;
+      opts.add(answer + delta);
+    }
+    return shuffle(Array.from(opts));
+  }
+
+  // ---------- State ----------
+  let questions = [];
+  let idx = 0;
+  let score = 0;
+  let startedAt = null;
+  let timerId = null;
+  let answered = []; // {picked, correct, shown}
+  let hasStarted = false;
+
+  // ---------- DOM ----------
+  const el = {
+    mode: $('mode'),
+    difficulty: $('difficulty'),
+    count: $('count'),
+    len: $('len'),
+    opt: $('opt'),
+    neg: $('neg'),
+    timer: $('timer'),
+
+    btnStart: $('btnStart'),
+    btnShuffle: $('btnShuffle'),
+    btnReset: $('btnReset'),
+    btnPrev: $('btnPrev'),
+    btnNext: $('btnNext'),
+    btnShow: $('btnShow'),
+
+    seq: $('seq'),
+    choices: $('choices'),
+    explain: $('explain'),
+
+    pillMode: $('pillMode'),
+    pillTimer: $('pillTimer'),
+
+    tagType: $('tagType'),
+    tagDiff: $('tagDiff'),
+    tagQ: $('tagQ'),
+    tagScore: $('tagScore'),
+    tagTime: $('tagTime'),
+
+    barFill: $('barFill')
+  };
+
+  function getLen(){
+    return clamp(parseInt(el.len.value||'6',10), 5, 10);
+  }
+
+  function setPills(){
+    const modeLabel = el.mode.options[el.mode.selectedIndex].textContent;
+    el.pillMode.textContent = `Mode: ${modeLabel}`;
+    el.pillTimer.textContent = `Timer: ${el.timer.checked ? 'ON' : 'OFF'}`;
+  }
+
+  function stopTimer(){
+    if(timerId) clearInterval(timerId);
+    timerId = null;
+  }
+  function startTimer(){
+    stopTimer();
+    startedAt = Date.now();
+    timerId = setInterval(() => {
+      const sec = (Date.now()-startedAt)/1000;
+      el.tagTime.textContent = `Waktu: ${fmtTime(sec)}`;
+    }, 250);
+  }
+
+  function updateProgress(){
+    const total = questions.length || 1;
+    const done = answered.filter(a => a && (a.picked !== null && a.picked !== undefined)).length;
+    const pct = Math.round((done/total)*100);
+    el.barFill.style.width = pct + '%';
+  }
+
+  function render(){
+    setPills();
+
+    if(!hasStarted){
+      el.tagType.textContent = 'Tipe: -';
+      el.tagDiff.textContent = 'Kesulitan: -';
+      el.tagQ.textContent = 'Soal: 0/0';
+      el.tagScore.textContent = 'Skor: 0';
+      el.tagTime.textContent = 'Waktu: 00:00';
+      el.barFill.style.width = '0%';
+      el.seq.textContent = 'Klik “Mulai” untuk membuat soal.';
+      el.choices.innerHTML = '';
+      el.explain.style.display = 'none';
+      return;
+    }
+
+    const q = questions[idx];
+    const total = questions.length;
+
+    el.tagType.textContent = `Tipe: ${q.type}`;
+    el.tagDiff.textContent = `Kesulitan: ${diffLabel(el.difficulty.value)}`;
+    el.tagQ.textContent = `Soal: ${idx+1}/${total}`;
+    el.tagScore.textContent = `Skor: ${score}`;
+
+    // sequence with ?
+    const seq = q.seq.slice();
+    seq[q.maskedIndex] = '?';
+    el.seq.textContent = seq.join(', ');
+
+    // choices
+    const a = answered[idx] || {picked:null, correct:false, shown:false};
+    answered[idx] = a;
+
+    el.choices.innerHTML = '';
+    q.choices.forEach((val, i) => {
+      const id = `c_${i}`;
+      const isPicked = a.picked === val;
+      const isCorrect = val === q.answer;
+      const show = a.shown;
+
+      const wrap = document.createElement('label');
+      wrap.className = 'choice';
+      wrap.setAttribute('for', id);
+
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'pick';
+      input.id = id;
+      input.value = String(val);
+      input.checked = isPicked;
+      input.disabled = (a.picked !== null && a.picked !== undefined); // lock after answer
+
+      const text = document.createElement('div');
+      text.style.flex = '1';
+      text.innerHTML = `<b>${i+1}.</b> ${val}`;
+
+      const badge = document.createElement('div');
+      badge.className = 'small';
+      badge.style.minWidth = '70px';
+      badge.style.textAlign = 'right';
+
+      if(show){
+        if(isCorrect) badge.innerHTML = `<span class="right">BENAR</span>`;
+        else if(isPicked) badge.innerHTML = `<span class="wrong">SALAH</span>`;
+        else badge.innerHTML = `<span class="muted"> </span>`;
+      } else {
+        badge.innerHTML = `<span class="muted"> </span>`;
+      }
+
+      wrap.appendChild(input);
+      wrap.appendChild(text);
+      wrap.appendChild(badge);
+
+      wrap.addEventListener('click', (e) => {
+        e.preventDefault();
+        if(a.picked !== null && a.picked !== undefined) return; // already answered
+        pickAnswer(val);
+      });
+
+      el.choices.appendChild(wrap);
+    });
+
+    // explain
+    if(a.shown){
+      el.explain.style.display = 'block';
+      el.explain.innerHTML =
+        `<b>Jawaban:</b> <span class="right">${q.answer}</span><br>` +
+        `<b>Pembahasan:</b> ${q.explain}`;
+    } else {
+      el.explain.style.display = 'none';
+      el.explain.textContent = '';
+    }
+
+    // buttons
+    el.btnPrev.disabled = idx === 0;
+    el.btnNext.disabled = idx === total-1;
+    el.btnShow.disabled = (a.picked === null || a.picked === undefined) ? true : a.shown;
+    updateProgress();
+  }
+
+  function diffLabel(d){
+    return d==='easy'?'Mudah':d==='med'?'Sedang':'Sulit';
+  }
+
+  function pickAnswer(val){
+    const q = questions[idx];
+    const a = answered[idx] || {picked:null, correct:false, shown:false};
+    if(a.picked !== null && a.picked !== undefined) return;
+
+    a.picked = val;
+    a.correct = (val === q.answer);
+    a.shown = false;
+    answered[idx] = a;
+
+    if(a.correct) score += 1;
+
+    // auto enable show
+    el.btnShow.disabled = false;
+    render();
+  }
+
+  function showAnswer(){
+    const a = answered[idx];
+    if(!a || a.picked === null || a.picked === undefined) return;
+    a.shown = true;
+    answered[idx] = a;
+    render();
+  }
+
+  function buildQuestions(){
+    const mode = el.mode.value;
+    const diff = el.difficulty.value;
+    const n = clamp(parseInt(el.count.value||'15',10), 5, 50);
+    const countChoices = parseInt(el.opt.value,10);
+    const allowNeg = el.neg.value === 'on';
+
+    const qs = [];
+    for(let i=0;i<n;i++){
+      const gen = pickGenerator(mode);
+      const base = gen(diff, allowNeg);
+      const choicesArr = makeChoices(base.answer, diff, countChoices);
+      qs.push({...base, choices: choicesArr});
+    }
+    return qs;
+  }
+
+  function start(){
+    questions = buildQuestions();
+    idx = 0;
+    score = 0;
+    answered = new Array(questions.length).fill(null).map(()=>({picked:null, correct:false, shown:false}));
+    hasStarted = true;
+
+    // timer
+    el.tagTime.textContent = 'Waktu: 00:00';
+    stopTimer();
+    if(el.timer.checked) startTimer();
+
+    // enable controls
+    el.btnShuffle.disabled = false;
+    el.btnReset.disabled = false;
+    el.btnNext.disabled = false;
+    el.btnShow.disabled = true;
+    el.btnPrev.disabled = true;
+
+    render();
+  }
+
+  function reshuffle(){
+    if(!hasStarted) return;
+    // keep settings; regenerate completely
+    start();
+  }
+
+  function resetAll(){
+    stopTimer();
+    questions = [];
+    idx = 0;
+    score = 0;
+    answered = [];
+    hasStarted = false;
+
+    el.btnShuffle.disabled = true;
+    el.btnReset.disabled = true;
+    el.btnPrev.disabled = true;
+    el.btnNext.disabled = true;
+    el.btnShow.disabled = true;
+
+    render();
+  }
+
+  // ---------- Events ----------
+  el.btnStart.addEventListener('click', start);
+  el.btnShuffle.addEventListener('click', reshuffle);
+  el.btnReset.addEventListener('click', resetAll);
+
+  el.btnPrev.addEventListener('click', () => {
+    if(idx>0){ idx--; render(); }
+  });
+  el.btnNext.addEventListener('click', () => {
+    if(idx<questions.length-1){ idx++; render(); }
+  });
+  el.btnShow.addEventListener('click', showAnswer);
+
+  el.mode.addEventListener('change', setPills);
+  el.timer.addEventListener('change', () => {
+    setPills();
+    if(!hasStarted) return;
+    // toggle timer live
+    if(el.timer.checked) startTimer();
+    else { stopTimer(); el.tagTime.textContent = 'Waktu: 00:00'; }
+  });
+
+  // keyboard shortcuts 1-5
+  window.addEventListener('keydown', (e) => {
+    if(!hasStarted) return;
+    const k = e.key;
+    if(k>='1' && k<='5'){
+      const i = parseInt(k,10)-1;
+      const q = questions[idx];
+      if(!q) return;
+      const a = answered[idx];
+      if(a.picked !== null && a.picked !== undefined) return;
+      if(i < q.choices.length) pickAnswer(q.choices[i]);
+    }
+    if(k === 'ArrowLeft') el.btnPrev.click();
+    if(k === 'ArrowRight') el.btnNext.click();
+    if(k.toLowerCase() === 'j') { if(!el.btnShow.disabled) el.btnShow.click(); }
+  });
+
+  // init
+  setPills();
+  render();
+})();
+</script>
+</body>
+</html>
