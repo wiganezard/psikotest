@@ -56,25 +56,43 @@
     let jawabanBenar = [];
     let interval;
     let waktu;
+    let daftarSoal = [];
 
-    function generateSoal() {
+    function generateSoalUnik() {
+        daftarSoal = [];
+
+        for (let a = 2; a <= 9; a++) {
+            for (let b = 2; b <= 9; b++) {
+                daftarSoal.push({ a, b });
+            }
+        }
+
+        // Acak soal (Fisher-Yates)
+        for (let i = daftarSoal.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [daftarSoal[i], daftarSoal[j]] = [daftarSoal[j], daftarSoal[i]];
+        }
+
+        // Ambil 30 soal unik
+        daftarSoal = daftarSoal.slice(0, jumlahSoal);
+    }
+
+    function tampilkanSoal() {
         const container = document.getElementById("soal-container");
         container.innerHTML = "";
         jawabanBenar = [];
 
-        for (let i = 0; i < jumlahSoal; i++) {
-            let a = Math.floor(Math.random() * 9) + 1;
-            let b = Math.floor(Math.random() * 9) + 1;
-            jawabanBenar.push(a * b);
+        daftarSoal.forEach((soal, i) => {
+            jawabanBenar.push(soal.a * soal.b);
 
             container.innerHTML += `
                 <div class="soal">
-                    ${i + 1}. ${a} × ${b} = 
+                    ${i + 1}. ${soal.a} × ${soal.b} =
                     <input type="number" id="jawaban${i}">
                     <span id="info${i}" class="salah"></span>
                 </div>
             `;
-        }
+        });
     }
 
     function mulaiTimer() {
@@ -91,9 +109,7 @@
 
             waktu--;
 
-            if (waktu < 0) {
-                selesai();
-            }
+            if (waktu < 0) selesai();
         }, 1000);
     }
 
@@ -117,16 +133,18 @@
         document.getElementById("hasil").textContent =
             `Skor Anda: ${skor} / ${jumlahSoal}`;
 
-        // ulang soal setelah 3 detik
+        // Ulang otomatis
         setTimeout(() => {
             document.getElementById("hasil").textContent = "";
-            generateSoal();
+            generateSoalUnik();
+            tampilkanSoal();
             mulaiTimer();
         }, 3000);
     }
 
-    // Mulai pertama kali
-    generateSoal();
+    // Mulai pertama
+    generateSoalUnik();
+    tampilkanSoal();
     mulaiTimer();
 </script>
 
