@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Pengurangan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .pengaturan, .timer, .hasil {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .soal {
+            margin-bottom: 8px;
+        }
+        .review {
+            background: #fff;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+        }
+        .benar { color: green; }
+        .salah { color: red; }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        input[type="number"] {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Quiz Pengurangan</h1>
+
+<div class="pengaturan" id="pengaturan">
+    <label>Jumlah Soal:
+        <input type="number" id="jumlahSoal" value="20" min="1" max="50">
+    </label>
+    <br><br>
+    <label>Waktu (menit):
+        <input type="number" id="waktuMenit" value="2" min="1" max="60">
+    </label>
+    <br><br>
+    <button onclick="mulaiQuiz()">Mulai Quiz</button>
+</div>
+
+<div class="timer" id="timer"></div>
+<div id="soal-container"></div>
+
+<div style="text-align:center;">
+    <button id="btnSelesai" onclick="selesai()" style="display:none;">Selesai</button>
+</div>
+
+<div class="hasil" id="hasil"></div>
+<div id="review-container"></div>
+
+<div style="text-align:center;">
+    <button id="btnUlang" onclick="resetQuiz()" style="display:none;">
+        🔄 Mulai Ulang Quiz
+    </button>
+</div>
+
+<script>
+    let jawabanBenar = [];
+    let soalData = [];
+    let interval;
+    let waktu;
+    let totalSoal = 0;
+
+    function mulaiQuiz() {
+        document.getElementById("pengaturan").style.display = "none";
+        document.getElementById("review-container").innerHTML = "";
+        document.getElementById("hasil").textContent = "";
+        document.getElementById("btnUlang").style.display = "none";
+
+        totalSoal = parseInt(document.getElementById("jumlahSoal").value);
+        let menit = parseInt(document.getElementById("waktuMenit").value);
+        waktu = menit * 60;
+
+        generateSoal();
+        mulaiTimer();
+
+        document.getElementById("btnSelesai").style.display = "inline-block";
+    }
+
+    function generateSoal() {
+        const container = document.getElementById("soal-container");
+        container.innerHTML = "";
+        jawabanBenar = [];
+        soalData = [];
+
+        let setSoal = new Set();
+
+        while (setSoal.size < totalSoal) {
+            let a = Math.floor(Math.random() * 90) + 10; // angka besar
+            let b = Math.floor(Math.random() * a);       // selalu <= a
+            setSoal.add(`${a}-${b}`);
+        }
+
+        [...setSoal].forEach((soal, i) => {
+            let [a, b] = soal.split("-").map(Number);
+            jawabanBenar.push(a - b);
+            soalData.push({ a, b });
+
+            container.innerHTML += `
+                <div class="soal">
+                    ${i + 1}. ${a} − ${b} =
+                    <input type="number" id="jawaban${i}">
+                </div>
+            `;
+        });
+    }
+
+    function mulaiTimer() {
+        const timerElement = document.getElementById("timer");
+
+        interval = setInterval(() => {
+            let menit = Math.floor(waktu / 60);
+            let detik = waktu % 60;
+
+            timerElement.textContent =
+                `Waktu: ${String(menit).padStart(2, '0')}:${String(detik).padStart(2, '0')}`;
+
+            waktu--;
+
+            if (waktu < 0) selesai();
+        }, 1000);
+    }
+
+    function selesai() {
+        clearInterval(interval);
+        document.getElementById("btnSelesai").style.display = "none";
+
+        let skor = 0;
+        let reviewHTML = "<h2>Review Jawaban</h2>";
+
+        for (let i = 0; i < totalSoal; i++) {
+            let user = parseInt(document.getElementById(`jawaban${i}`).value);
+            let benar = jawabanBenar[i];
+
+            let status = user === benar ? "benar" : "salah";
+            if (status === "benar") skor++;
+
+            reviewHTML += `
+                <div class="review ${status}">
+                    ${i + 1}. ${soalData[i].a} − ${soalData[i].b} =
+                    ${isNaN(user) ? "(kosong)" : user}
+                    → <strong>${status.toUpperCase()}</strong>
+                    ${status === "salah" ? `(Jawaban benar: ${benar})` : ""}
+                </div>
+            `;
+        }
+
+        document.getElementById("hasil").textContent =
+            `Skor Akhir: ${skor} / ${totalSoal}`;
+
+        document.getElementById("review-container").innerHTML = reviewHTML;
+        document.getElementById("btnUlang").style.display = "inline-block";
+    }
+
+    function resetQuiz() {
+        document.getElementById("pengaturan").style.display = "block";
+        document.getElementById("timer").textContent = "";
+        document.getElementById("soal-container").innerHTML = "";
+        document.getElementById("review-container").innerHTML = "";
+        document.getElementById("hasil").textContent = "";
+        document.getElementById("btnUlang").style.display = "none";
+    }
+</script>
+
+</body>
+</html>
