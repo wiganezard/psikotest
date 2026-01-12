@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Latihan Perkalian</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .timer {
+            font-size: 20px;
+            font-weight: bold;
+            color: red;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .soal {
+            margin-bottom: 8px;
+        }
+        .salah {
+            color: red;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .hasil {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Latihan Perkalian (Di Bawah 10)</h1>
+<div class="timer" id="timer">Waktu: 02:00</div>
+
+<div id="soal-container"></div>
+
+<button onclick="selesai()">Selesai</button>
+
+<div class="hasil" id="hasil"></div>
+
+<script>
+    const jumlahSoal = 30;
+    let jawabanBenar = [];
+    let interval;
+    let waktu;
+
+    function generateSoal() {
+        const container = document.getElementById("soal-container");
+        container.innerHTML = "";
+        jawabanBenar = [];
+
+        for (let i = 0; i < jumlahSoal; i++) {
+            let a = Math.floor(Math.random() * 9) + 1;
+            let b = Math.floor(Math.random() * 9) + 1;
+            jawabanBenar.push(a * b);
+
+            container.innerHTML += `
+                <div class="soal">
+                    ${i + 1}. ${a} × ${b} = 
+                    <input type="number" id="jawaban${i}">
+                    <span id="info${i}" class="salah"></span>
+                </div>
+            `;
+        }
+    }
+
+    function mulaiTimer() {
+        clearInterval(interval);
+        waktu = 120;
+        const timerElement = document.getElementById("timer");
+
+        interval = setInterval(() => {
+            let menit = Math.floor(waktu / 60);
+            let detik = waktu % 60;
+
+            timerElement.textContent =
+                `Waktu: ${String(menit).padStart(2, '0')}:${String(detik).padStart(2, '0')}`;
+
+            waktu--;
+
+            if (waktu < 0) {
+                selesai();
+            }
+        }, 1000);
+    }
+
+    function selesai() {
+        clearInterval(interval);
+        let skor = 0;
+
+        for (let i = 0; i < jumlahSoal; i++) {
+            let input = document.getElementById(`jawaban${i}`);
+            let info = document.getElementById(`info${i}`);
+            let jawabanUser = parseInt(input.value);
+
+            if (jawabanUser === jawabanBenar[i]) {
+                skor++;
+                info.textContent = "";
+            } else {
+                info.textContent = `Jawaban benar: ${jawabanBenar[i]}`;
+            }
+        }
+
+        document.getElementById("hasil").textContent =
+            `Skor Anda: ${skor} / ${jumlahSoal}`;
+
+        // ulang soal setelah 3 detik
+        setTimeout(() => {
+            document.getElementById("hasil").textContent = "";
+            generateSoal();
+            mulaiTimer();
+        }, 3000);
+    }
+
+    // Mulai pertama kali
+    generateSoal();
+    mulaiTimer();
+</script>
+
+</body>
+</html>
